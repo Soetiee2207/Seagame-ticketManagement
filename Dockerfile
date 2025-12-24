@@ -1,13 +1,18 @@
-# Build stage
+# =============================================
+# Dockerfile for SEA Games Ticketing System
+# Deploy to Render.com
+# =============================================
+
+# Stage 1: Build the application
 FROM eclipse-temurin:21-jdk-alpine AS build
 WORKDIR /app
 
-# Copy maven wrapper and pom.xml
+# Copy Maven wrapper and pom.xml first for better caching
 COPY mvnw .
 COPY .mvn .mvn
 COPY pom.xml .
 
-# Make maven wrapper executable
+# Make mvnw executable
 RUN chmod +x mvnw
 
 # Download dependencies (cached layer)
@@ -17,31 +22,25 @@ RUN ./mvnw dependency:go-offline -B
 COPY src src
 
 # Build the application
-RUN ./mvnw clean package -DskipTests
+RUN ./mvnw clean package -DskipTests -B
 
-# Runtime stage
+# Stage 2: Run the application
 FROM eclipse-temurin:21-jre-alpine
 WORKDIR /app
 
 # Create non-root user for security
-RUN addgroup -g 1001 -S appgroup && \
-    adduser -u 1001 -S appuser -G appgroup
+RUN addgroup -S spring && adduser -S spring -G spring
+USER spring:spring
 
-# Copy the JAR file from build stage
+# Copy the built JAR from build stage
 COPY --from=build /app/target/*.jar app.jar
 
-# Set ownership
-RUN chown -R appuser:appgroup /app
-
-# Switch to non-root user
-USER appuser
-
-# Expose the application port
+# Expose port (Render will override with PORT env var)
 EXPOSE 8080
 
 # Health check
-HEALTHCHECK --interval=30s --timeout=3s --start-period=60s --retries=3 \
-    CMD wget --no-verbose --tries=1 --spider http://localhost:8080/ || exit 1
+HEALTHCHECK --interval=30s --timeout=10s --start-period=60s --retries=3 \
+    CMD wget --no-verbose --tries=1 --spider http://localhost:${PORT:-8080}/actuator/health || exit 1
 
-# Run the application
-ENTRYPOINT ["java", "-jar", "app.jar"]
+# Run the application with production profile
+ENTRYPOINT ["java", "-Xmx512m", "-Xms256m", "-jar", "app.jar", "--spring.profiles.active=prod"]

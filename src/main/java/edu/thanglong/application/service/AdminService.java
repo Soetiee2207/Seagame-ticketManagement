@@ -2,6 +2,7 @@ package edu.thanglong.application.service;
 
 import edu.thanglong.application.dto.TicketDTO;
 import edu.thanglong.domain.entity.*;
+import edu.thanglong.domain.repository.MatchRepository;
 import edu.thanglong.domain.repository.TicketRepository;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -14,14 +15,55 @@ import java.util.stream.Collectors;
 public class AdminService {
 
     private final TicketRepository ticketRepository;
+    private final MatchRepository matchRepository;
 
-    public AdminService(TicketRepository ticketRepository) {
+    public AdminService(TicketRepository ticketRepository, MatchRepository matchRepository) {
         this.ticketRepository = ticketRepository;
+        this.matchRepository = matchRepository;
+    }
+
+    // ========== MATCH MANAGEMENT ==========
+
+    public List<Match> getAllMatches() {
+        return matchRepository.findAll();
+    }
+
+    public Optional<Match> getMatchById(Long id) {
+        return matchRepository.findById(id);
+    }
+
+    @Transactional
+    public Match saveMatch(Match match) {
+        return matchRepository.save(match);
+    }
+
+    @Transactional
+    public void deleteMatch(Long id) throws Exception {
+        List<Ticket> tickets = ticketRepository.findByMatchId(id);
+        if (!tickets.isEmpty()) {
+            throw new Exception("Không thể xóa trận đấu này vì đã có " + tickets.size() + " vé được đặt!");
+        }
+        matchRepository.deleteById(id);
+    }
+
+    public long countTotalMatches() {
+        return matchRepository.findAll().size();
     }
 
     @Transactional
     public TicketDTO verifyTicket(String ticketCode) throws Exception {
-        Optional<Ticket> ticketOpt = ticketRepository.findByTicketCode(ticketCode);
+        Optional<Ticket> ticketOpt;
+        
+        // Support short code (8 chars) or full UUID
+        if (ticketCode.length() < 36) {
+            // Search by prefix (short code)
+            List<Ticket> allTickets = ticketRepository.findAll();
+            ticketOpt = allTickets.stream()
+                    .filter(t -> t.getTicketCode().toUpperCase().startsWith(ticketCode.toUpperCase()))
+                    .findFirst();
+        } else {
+            ticketOpt = ticketRepository.findByTicketCode(ticketCode);
+        }
         
         if (ticketOpt.isEmpty()) {
             throw new Exception("Không tìm thấy vé với mã: " + ticketCode);

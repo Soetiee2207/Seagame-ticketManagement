@@ -15,12 +15,16 @@ public class TicketDTO {
     private String statusText;
     private String location;
     private LocalDateTime matchTime;
+    private String paymentMethod;
+    private Integer paymentStatus;
+    private String paymentStatusText;
 
     public TicketDTO() {}
 
     public TicketDTO(Long id, String ticketCode, String matchName, String seatCode, String categoryName,
                      BigDecimal price, LocalDateTime bookingTime, Integer status, String statusText,
-                     String location, LocalDateTime matchTime) {
+                     String location, LocalDateTime matchTime, String paymentMethod, 
+                     Integer paymentStatus, String paymentStatusText) {
         this.id = id;
         this.ticketCode = ticketCode;
         this.matchName = matchName;
@@ -32,6 +36,9 @@ public class TicketDTO {
         this.statusText = statusText;
         this.location = location;
         this.matchTime = matchTime;
+        this.paymentMethod = paymentMethod;
+        this.paymentStatus = paymentStatus;
+        this.paymentStatusText = paymentStatusText;
     }
 
     public Long getId() { return id; }
@@ -67,6 +74,15 @@ public class TicketDTO {
     public LocalDateTime getMatchTime() { return matchTime; }
     public void setMatchTime(LocalDateTime matchTime) { this.matchTime = matchTime; }
 
+    public String getPaymentMethod() { return paymentMethod; }
+    public void setPaymentMethod(String paymentMethod) { this.paymentMethod = paymentMethod; }
+
+    public Integer getPaymentStatus() { return paymentStatus; }
+    public void setPaymentStatus(Integer paymentStatus) { this.paymentStatus = paymentStatus; }
+
+    public String getPaymentStatusText() { return paymentStatusText; }
+    public void setPaymentStatusText(String paymentStatusText) { this.paymentStatusText = paymentStatusText; }
+
     public static TicketDTOBuilder builder() { return new TicketDTOBuilder(); }
 
     public static class TicketDTOBuilder {
@@ -81,6 +97,9 @@ public class TicketDTO {
         private String statusText;
         private String location;
         private LocalDateTime matchTime;
+        private String paymentMethod;
+        private Integer paymentStatus;
+        private String paymentStatusText;
 
         public TicketDTOBuilder id(Long id) { this.id = id; return this; }
         public TicketDTOBuilder ticketCode(String ticketCode) { this.ticketCode = ticketCode; return this; }
@@ -93,10 +112,15 @@ public class TicketDTO {
         public TicketDTOBuilder statusText(String statusText) { this.statusText = statusText; return this; }
         public TicketDTOBuilder location(String location) { this.location = location; return this; }
         public TicketDTOBuilder matchTime(LocalDateTime matchTime) { this.matchTime = matchTime; return this; }
+        public TicketDTOBuilder paymentMethod(String paymentMethod) { this.paymentMethod = paymentMethod; return this; }
+        public TicketDTOBuilder paymentStatus(Integer paymentStatus) { this.paymentStatus = paymentStatus; return this; }
+        public TicketDTOBuilder paymentStatusText(String paymentStatusText) { this.paymentStatusText = paymentStatusText; return this; }
 
         public TicketDTO build() {
             return new TicketDTO(id, ticketCode, matchName, seatCode, categoryName, price,
-                    bookingTime, status, statusText, location, matchTime);
+                    bookingTime, status, statusText, location, matchTime, 
+                    paymentMethod, paymentStatus, paymentStatusText);
         }
     }
 }
+

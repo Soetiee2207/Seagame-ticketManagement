@@ -32,9 +32,20 @@ public class Ticket {
     @Column
     private Integer status;
 
+    @Column(name = "payment_method", length = 50)
+    private String paymentMethod;
+
+    @Column(name = "payment_status")
+    private Integer paymentStatus; // 0 = Pending, 1 = Paid, 2 = Cancelled
+
+    @Column(name = "payment_time")
+    private LocalDateTime paymentTime;
+
     public Ticket() {}
 
-    public Ticket(Long id, String ticketCode, User user, Seat seat, Match match, LocalDateTime bookingTime, Integer status) {
+    public Ticket(Long id, String ticketCode, User user, Seat seat, Match match, 
+                  LocalDateTime bookingTime, Integer status, String paymentMethod, 
+                  Integer paymentStatus, LocalDateTime paymentTime) {
         this.id = id;
         this.ticketCode = ticketCode;
         this.user = user;
@@ -42,6 +53,9 @@ public class Ticket {
         this.match = match;
         this.bookingTime = bookingTime;
         this.status = status;
+        this.paymentMethod = paymentMethod;
+        this.paymentStatus = paymentStatus;
+        this.paymentTime = paymentTime;
     }
 
     public Long getId() { return id; }
@@ -65,6 +79,15 @@ public class Ticket {
     public Integer getStatus() { return status; }
     public void setStatus(Integer status) { this.status = status; }
 
+    public String getPaymentMethod() { return paymentMethod; }
+    public void setPaymentMethod(String paymentMethod) { this.paymentMethod = paymentMethod; }
+
+    public Integer getPaymentStatus() { return paymentStatus; }
+    public void setPaymentStatus(Integer paymentStatus) { this.paymentStatus = paymentStatus; }
+
+    public LocalDateTime getPaymentTime() { return paymentTime; }
+    public void setPaymentTime(LocalDateTime paymentTime) { this.paymentTime = paymentTime; }
+
     public static TicketBuilder builder() { return new TicketBuilder(); }
 
     public static class TicketBuilder {
@@ -75,6 +98,9 @@ public class Ticket {
         private Match match;
         private LocalDateTime bookingTime;
         private Integer status;
+        private String paymentMethod;
+        private Integer paymentStatus;
+        private LocalDateTime paymentTime;
 
         public TicketBuilder id(Long id) { this.id = id; return this; }
         public TicketBuilder ticketCode(String ticketCode) { this.ticketCode = ticketCode; return this; }
@@ -83,9 +109,14 @@ public class Ticket {
         public TicketBuilder match(Match match) { this.match = match; return this; }
         public TicketBuilder bookingTime(LocalDateTime bookingTime) { this.bookingTime = bookingTime; return this; }
         public TicketBuilder status(Integer status) { this.status = status; return this; }
+        public TicketBuilder paymentMethod(String paymentMethod) { this.paymentMethod = paymentMethod; return this; }
+        public TicketBuilder paymentStatus(Integer paymentStatus) { this.paymentStatus = paymentStatus; return this; }
+        public TicketBuilder paymentTime(LocalDateTime paymentTime) { this.paymentTime = paymentTime; return this; }
 
         public Ticket build() {
-            return new Ticket(id, ticketCode, user, seat, match, bookingTime, status);
+            return new Ticket(id, ticketCode, user, seat, match, bookingTime, status, 
+                              paymentMethod, paymentStatus, paymentTime);
         }
     }
 }
+

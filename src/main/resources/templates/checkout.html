@@ -1,0 +1,126 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+
+<head th:replace="~{fragments/layout :: head('Thanh toán - SEA Games')}"></head>
+
+<body class="d-flex flex-column min-vh-100">
+    <nav th:replace="~{fragments/layout :: navbar}"></nav>
+
+    <main class="flex-fill">
+        <div class="container py-5">
+            <div class="row justify-content-center">
+                <div class="col-lg-8">
+                    <h2 class="mb-4 text-center">
+                        <i class="bi bi-credit-card me-2"></i>Xác nhận thanh toán
+                    </h2>
+
+                    <div class="row g-4">
+                        <!-- Order Summary -->
+                        <div class="col-md-6">
+                            <div class="card shadow-sm border-0 h-100">
+                                <div class="card-header bg-primary text-white">
+                                    <h5 class="mb-0"><i class="bi bi-receipt me-2"></i>Chi tiết đơn hàng</h5>
+                                </div>
+                                <div class="card-body">
+                                    <div class="mb-3">
+                                        <small class="text-muted">Trận đấu</small>
+                                        <h5 th:text="${checkout.matchName}">Tên trận đấu</h5>
+                                    </div>
+                                    <div class="mb-3">
+                                        <small class="text-muted">Thời gian</small>
+                                        <p class="mb-0">
+                                            <i class="bi bi-calendar3 me-1 text-primary"></i>
+                                            <span
+                                                th:text="${#temporals.format(checkout.matchTime, 'dd/MM/yyyy HH:mm')}"></span>
+                                        </p>
+                                    </div>
+                                    <div class="mb-3">
+                                        <small class="text-muted">Địa điểm</small>
+                                        <p class="mb-0">
+                                            <i class="bi bi-geo-alt me-1 text-danger"></i>
+                                            <span th:text="${checkout.location}"></span>
+                                        </p>
+                                    </div>
+                                    <hr>
+                                    <div class="mb-3">
+                                        <small class="text-muted">Ghế đã chọn</small>
+                                        <h4 class="text-primary mb-0">
+                                            <i class="bi bi-ticket-perforated me-2"></i>
+                                            <span th:text="${checkout.seatCode}"></span>
+                                            <span class="badge bg-warning text-dark ms-2"
+                                                th:text="${checkout.categoryName}"></span>
+                                        </h4>
+                                    </div>
+                                    <hr>
+                                    <div class="d-flex justify-content-between align-items-center">
+                                        <span class="fs-5">Giá vé:</span>
+                                        <span class="fs-4 fw-bold text-danger"
+                                            th:text="${#numbers.formatDecimal(checkout.price, 0, 'COMMA', 0, 'POINT') + ' VNĐ'}"></span>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Payment with Wallet -->
+                        <div class="col-md-6">
+                            <div class="card shadow-sm border-0 h-100">
+                                <div class="card-header bg-success text-white">
+                                    <h5 class="mb-0"><i class="bi bi-wallet2 me-2"></i>Thanh toán bằng Ví</h5>
+                                </div>
+                                <div class="card-body">
+                                    <!-- Current Balance -->
+                                    <div class="text-center py-3 mb-3 bg-light rounded">
+                                        <small class="text-muted d-block">Số dư ví hiện tại</small>
+                                        <h3 class="text-success mb-0"
+                                            th:text="${#numbers.formatDecimal(currentUser.balance, 0, 'COMMA', 0, 'POINT') + ' VNĐ'}">
+                                            0 VNĐ</h3>
+                                    </div>
+
+                                    <!-- Balance Check -->
+                                    <div th:if="${currentUser.balance.compareTo(checkout.price) >= 0}"
+                                        class="alert alert-success">
+                                        <i class="bi bi-check-circle me-2"></i>
+                                        Số dư đủ để thanh toán
+                                    </div>
+                                    <div th:if="${currentUser.balance.compareTo(checkout.price) < 0}"
+                                        class="alert alert-danger">
+                                        <i class="bi bi-exclamation-triangle me-2"></i>
+                                        Số dư không đủ! Bạn cần nạp thêm
+                                        <strong
+                                            th:text="${#numbers.formatDecimal(checkout.price.subtract(currentUser.balance), 0, 'COMMA', 0, 'POINT') + ' VNĐ'}"></strong>
+                                    </div>
+
+                                    <form th:action="@{/checkout/confirm}" method="post">
+                                        <input type="hidden" name="seatId" th:value="${checkout.seatId}">
+                                        <input type="hidden" name="matchId" th:value="${checkout.matchId}">
+                                        <input type="hidden" name="paymentMethod" value="WALLET">
+
+                                        <div class="d-grid gap-2 mt-4">
+                                            <button type="submit" class="btn btn-success btn-lg"
+                                                th:disabled="${currentUser.balance.compareTo(checkout.price) < 0}">
+                                                <i class="bi bi-check-circle me-2"></i>Xác nhận thanh toán
+                                            </button>
+                                            <a th:if="${currentUser.balance.compareTo(checkout.price) < 0}"
+                                                th:href="@{/wallet}" class="btn btn-warning btn-lg">
+                                                <i class="bi bi-plus-circle me-2"></i>Nạp tiền ngay
+                                            </a>
+                                            <a th:href="@{/booking/{id}(id=${checkout.matchId})}"
+                                                class="btn btn-outline-secondary">
+                                                <i class="bi bi-arrow-left me-2"></i>Quay lại chọn ghế
+                                            </a>
+                                        </div>
+                                    </form>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </main>
+
+    <footer th:replace="~{fragments/layout :: footer}"></footer>
+    <th:block th:replace="~{fragments/layout :: scripts}"></th:block>
+</body>
+
+</html>

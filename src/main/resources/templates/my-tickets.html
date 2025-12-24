@@ -27,63 +27,54 @@
 
             <div class="row g-4">
                 <div th:each="ticket : ${tickets}" class="col-md-6 col-lg-4">
-                    <div class="card h-100 shadow-sm border-0 ticket-card">
-                        <div class="card-header" th:classappend="${ticket.status == 0} ? 'bg-success' : 'bg-secondary'"
-                            th:attrappend="class=${' text-white'}">
-                            <div class="d-flex justify-content-between align-items-center">
-                                <h6 class="mb-0"><i class="bi bi-ticket-fill me-2"></i>Vé điện tử</h6>
-                                <span class="badge"
-                                    th:classappend="${ticket.status == 0} ? 'bg-light text-success' : 'bg-light text-secondary'"
-                                    th:text="${ticket.statusText}">Trạng thái</span>
+                    <a th:href="@{/my-tickets/{id}(id=${ticket.id})}" class="text-decoration-none">
+                        <div class="card h-100 shadow-sm border-0 ticket-card"
+                            style="cursor: pointer; transition: transform 0.2s;">
+                            <div class="card-header"
+                                th:classappend="${ticket.status == 0} ? 'bg-success' : 'bg-secondary'"
+                                th:attrappend="class=${' text-white'}">
+                                <div class="d-flex justify-content-between align-items-center">
+                                    <h6 class="mb-0"><i class="bi bi-ticket-fill me-2"></i>Vé điện tử</h6>
+                                    <span class="badge"
+                                        th:classappend="${ticket.status == 0} ? 'bg-light text-success' : 'bg-light text-secondary'"
+                                        th:text="${ticket.statusText}">Trạng thái</span>
+                                </div>
                             </div>
-                        </div>
-                        <div class="card-body">
-                            <h5 class="text-primary mb-3" th:text="${ticket.matchName}">Tên trận đấu</h5>
+                            <div class="card-body">
+                                <h5 class="text-primary mb-3" th:text="${ticket.matchName}">Tên trận đấu</h5>
 
-                            <div class="ticket-info">
-                                <p class="mb-2">
-                                    <i class="bi bi-upc me-2 text-muted"></i>
-                                    <strong>Mã vé:</strong>
-                                    <code class="ticket-code" th:text="${ticket.ticketCode}">UUID</code>
-                                </p>
-                                <p class="mb-2">
-                                    <i class="bi bi-pin-map me-2 text-muted"></i>
+                                <!-- Short Code Display -->
+                                <div class="text-center mb-3 p-2 bg-light rounded">
+                                    <small class="text-muted d-block">Mã check-in</small>
+                                    <h4 class="text-primary font-monospace mb-0" style="letter-spacing: 2px;"
+                                        th:text="${#strings.substring(ticket.ticketCode, 0, 8).toUpperCase()}">ABC12345
+                                    </h4>
+                                </div>
+
+                                <p class="mb-1 text-dark">
+                                    <i class="bi bi-pin-map me-1 text-muted"></i>
                                     <strong>Ghế:</strong> <span th:text="${ticket.seatCode}">A01</span>
                                     <span class="badge bg-warning text-dark ms-1"
                                         th:text="${ticket.categoryName}">VIP</span>
                                 </p>
-                                <p class="mb-2">
-                                    <i class="bi bi-geo-alt me-2 text-muted"></i>
-                                    <strong>Địa điểm:</strong> <span th:text="${ticket.location}">Sân vận động</span>
-                                </p>
-                                <p class="mb-2">
-                                    <i class="bi bi-calendar-check me-2 text-muted"></i>
-                                    <strong>Thời gian:</strong>
+                                <p class="mb-1 text-dark">
+                                    <i class="bi bi-calendar-check me-1 text-muted"></i>
                                     <span th:text="${#temporals.format(ticket.matchTime, 'dd/MM/yyyy HH:mm')}">Thời
                                         gian</span>
                                 </p>
-                                <p class="mb-2">
-                                    <i class="bi bi-cash me-2 text-muted"></i>
-                                    <strong>Giá vé:</strong>
+                                <p class="mb-0 text-dark">
+                                    <i class="bi bi-cash me-1 text-muted"></i>
                                     <span class="text-success fw-bold"
                                         th:text="${#numbers.formatDecimal(ticket.price, 0, 0) + ' VNĐ'}">500,000
                                         VNĐ</span>
                                 </p>
-                                <p class="mb-0 small text-muted">
-                                    <i class="bi bi-clock me-2"></i>
-                                    Đặt lúc: <span
-                                        th:text="${#temporals.format(ticket.bookingTime, 'dd/MM/yyyy HH:mm')}">Booking
-                                        time</span>
-                                </p>
+                            </div>
+                            <div class="card-footer bg-light text-center">
+                                <small class="text-primary"><i class="bi bi-qr-code me-1"></i>Nhấn để xem QR
+                                    Code</small>
                             </div>
                         </div>
-                        <div class="card-footer bg-light">
-                            <div class="d-flex justify-content-between align-items-center">
-                                <small class="text-muted">Xuất trình mã vé khi check-in</small>
-                                <i class="bi bi-qr-code fs-4 text-primary"></i>
-                            </div>
-                        </div>
-                    </div>
+                    </a>
                 </div>
             </div>
         </div>
@@ -91,6 +82,13 @@
 
     <footer th:replace="~{fragments/layout :: footer}"></footer>
     <th:block th:replace="~{fragments/layout :: scripts}"></th:block>
+
+    <style>
+        .ticket-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 0.5rem 1rem rgba(0, 0, 0, 0.15) !important;
+        }
+    </style>
 </body>
 
 </html>

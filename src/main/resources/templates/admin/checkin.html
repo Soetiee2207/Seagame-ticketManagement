@@ -17,7 +17,25 @@
                 </a>
             </div>
 
-            <div class="row justify-content-center">
+            <div class="row g-4">
+                <!-- QR Scanner Column -->
+                <div class="col-md-6">
+                    <div class="card shadow-sm border-0">
+                        <div class="card-header bg-primary text-white">
+                            <h5 class="mb-0"><i class="bi bi-camera me-2"></i>Quét mã QR</h5>
+                        </div>
+                        <div class="card-body text-center p-4">
+                            <div id="qr-reader" style="width: 100%;"></div>
+                            <div id="qr-reader-results" class="mt-3"></div>
+                            <p class="text-muted mt-3 mb-0">
+                                <i class="bi bi-info-circle me-1"></i>
+                                Hướng camera vào mã QR trên vé để quét
+                            </p>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Manual Input Column -->
                 <div class="col-md-6">
                     <div class="card shadow-sm border-0">
                         <div class="card-header bg-info text-white">
@@ -33,13 +51,15 @@
                                 <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
                             </div>
 
-                            <form th:action="@{/admin/checkin}" method="post">
+                            <form th:action="@{/admin/checkin}" method="post" id="checkin-form">
                                 <div class="mb-4">
-                                    <label class="form-label"><i class="bi bi-upc me-1"></i>Mã vé (UUID)</label>
-                                    <input type="text" name="ticketCode" class="form-control form-control-lg"
-                                        placeholder="Nhập hoặc quét mã vé..." required pattern="[a-fA-F0-9-]{36}">
-                                    <div class="form-text">Nhập đầy đủ mã vé 36 ký tự (VD:
-                                        550e8400-e29b-41d4-a716-446655440000)</div>
+                                    <label class="form-label"><i class="bi bi-upc me-1"></i>Mã vé</label>
+                                    <input type="text" name="ticketCode" id="ticketCode"
+                                        class="form-control form-control-lg text-uppercase"
+                                        placeholder="Nhập mã 8 ký tự hoặc quét QR..." required autofocus>
+                                    <div class="form-text">
+                                        Nhập 8 ký tự đầu của mã vé (VD: 550E8400) hoặc quét QR code
+                                    </div>
                                 </div>
                                 <button type="submit" class="btn btn-info btn-lg w-100">
                                     <i class="bi bi-check2-circle me-2"></i>Xác nhận Check-in
@@ -51,7 +71,7 @@
                     <!-- Checked Ticket Info -->
                     <div th:if="${checkedTicket}" class="card shadow-sm border-0 mt-4">
                         <div class="card-header bg-success text-white">
-                            <h5 class="mb-0"><i class="bi bi-check-circle-fill me-2"></i>Thông tin vé đã check-in</h5>
+                            <h5 class="mb-0"><i class="bi bi-check-circle-fill me-2"></i>✓ Đã check-in thành công!</h5>
                         </div>
                         <div class="card-body">
                             <div class="row">
@@ -86,6 +106,40 @@
 
     <footer th:replace="~{fragments/layout :: footer}"></footer>
     <th:block th:replace="~{fragments/layout :: scripts}"></th:block>
+
+    <!-- QR Scanner Library -->
+    <script src="https://unpkg.com/html5-qrcode@2.3.8/html5-qrcode.min.js"></script>
+    <script>
+        document.addEventListener('DOMContentLoaded', function () {
+            const html5QrCode = new Html5Qrcode("qr-reader");
+            const resultsDiv = document.getElementById("qr-reader-results");
+            const ticketInput = document.getElementById("ticketCode");
+            const checkinForm = document.getElementById("checkin-form");
+
+            html5QrCode.start(
+                { facingMode: "environment" },
+                {
+                    fps: 10,
+                    qrbox: { width: 250, height: 250 }
+                },
+                (decodedText, decodedResult) => {
+                    // Put scanned code in input and submit
+                    ticketInput.value = decodedText;
+                    resultsDiv.innerHTML = '<div class="alert alert-success"><i class="bi bi-check-circle me-2"></i>Đã quét: ' + decodedText.substring(0, 8).toUpperCase() + '</div>';
+
+                    // Auto submit after short delay
+                    setTimeout(() => {
+                        checkinForm.submit();
+                    }, 500);
+                },
+                (errorMessage) => {
+                    // Ignore scan errors (no QR found)
+                }
+            ).catch((err) => {
+                resultsDiv.innerHTML = '<div class="alert alert-warning"><i class="bi bi-exclamation-triangle me-2"></i>Không thể truy cập camera. Vui lòng nhập mã thủ công.</div>';
+            });
+        });
+    </script>
 </body>
 
 </html>

@@ -1,27 +1,29 @@
-# Render.com deployment configuration
+# =============================================
+# Render Blueprint Configuration
+# https://render.com/docs/blueprint-spec
+# =============================================
+
 services:
   - type: web
     name: seagame-ticketing
     runtime: docker
+    plan: free
+    region: singapore
     dockerfilePath: ./Dockerfile
+    healthCheckPath: /
     envVars:
+      # Aiven MySQL Database Configuration
+      # Replace these values with your actual Aiven credentials
+      - key: SPRING_DATASOURCE_URL
+        sync: false
+        # Example: jdbc:mysql://mysql-xxx.aivencloud.com:12345/seagame_db?useSSL=true&requireSSL=true
+      - key: SPRING_DATASOURCE_USERNAME
+        sync: false
+        # Example: avnadmin
+      - key: SPRING_DATASOURCE_PASSWORD
+        sync: false
+        # Your Aiven password (keep secret!)
       - key: SPRING_PROFILES_ACTIVE
         value: prod
-      - key: DATABASE_URL
-        fromDatabase:
-          name: seagame-db
-          property: connectionString
-      - key: DATABASE_USERNAME
-        fromDatabase:
-          name: seagame-db
-          property: user
-      - key: DATABASE_PASSWORD
-        fromDatabase:
-          name: seagame-db
-          property: password
-
-databases:
-  - name: seagame-db
-    databaseName: seagame_db
-    user: seagame_user
-    plan: free
+      - key: JAVA_OPTS
+        value: "-Xmx512m -Xms256m"

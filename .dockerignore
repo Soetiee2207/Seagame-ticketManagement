@@ -8,26 +8,33 @@
 *.iml
 .vscode
 .settings
-.project
 .classpath
+.project
 .factorypath
 
-# Build output
+# Build
 target/
+!target/*.jar
 
 # Logs
 *.log
 logs/
 
-# OS files
-.DS_Store
-Thumbs.db
+# Temp files
+*.tmp
+*.bak
+*.swp
 
 # Documentation
-*.md
-*.txt
+README.md
+README.txt
+HELP.md
+docs/
 
-# Docker
-Dockerfile
-docker-compose*.yml
-.dockerignore
+# Test files
+src/test/
+
+# Local configuration
+application-local.properties
+*.env
+.env.local

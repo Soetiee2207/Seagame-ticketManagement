@@ -1,6 +1,7 @@
 package edu.thanglong.domain.entity;
 
 import jakarta.persistence.*;
+import java.math.BigDecimal;
 
 @Entity
 @Table(name = "users")
@@ -22,14 +23,18 @@ public class User {
     @Column(length = 20)
     private String role;
 
+    @Column(precision = 15, scale = 2)
+    private BigDecimal balance = BigDecimal.ZERO;
+
     public User() {}
 
-    public User(Long id, String username, String password, String fullName, String role) {
+    public User(Long id, String username, String password, String fullName, String role, BigDecimal balance) {
         this.id = id;
         this.username = username;
         this.password = password;
         this.fullName = fullName;
         this.role = role;
+        this.balance = balance != null ? balance : BigDecimal.ZERO;
     }
 
     public Long getId() { return id; }
@@ -47,6 +52,9 @@ public class User {
     public String getRole() { return role; }
     public void setRole(String role) { this.role = role; }
 
+    public BigDecimal getBalance() { return balance != null ? balance : BigDecimal.ZERO; }
+    public void setBalance(BigDecimal balance) { this.balance = balance; }
+
     public static UserBuilder builder() { return new UserBuilder(); }
 
     public static class UserBuilder {
@@ -55,15 +63,18 @@ public class User {
         private String password;
         private String fullName;
         private String role;
+        private BigDecimal balance = BigDecimal.ZERO;
 
         public UserBuilder id(Long id) { this.id = id; return this; }
         public UserBuilder username(String username) { this.username = username; return this; }
         public UserBuilder password(String password) { this.password = password; return this; }
         public UserBuilder fullName(String fullName) { this.fullName = fullName; return this; }
         public UserBuilder role(String role) { this.role = role; return this; }
+        public UserBuilder balance(BigDecimal balance) { this.balance = balance; return this; }
 
         public User build() {
-            return new User(id, username, password, fullName, role);
+            return new User(id, username, password, fullName, role, balance);
         }
     }
 }
+

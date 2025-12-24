@@ -64,7 +64,7 @@
                             <div class="seats-container">
                                 <div class="row g-2 justify-content-center">
                                     <div th:each="seat : ${seats}" class="col-auto">
-                                        <form th:if="${!seat.booked}" th:action="@{/booking/book}" method="post"
+                                        <form th:if="${!seat.booked}" th:action="@{/checkout}" method="post"
                                             class="d-inline">
                                             <input type="hidden" name="seatId" th:value="${seat.id}">
                                             <input type="hidden" name="matchId" th:value="${matchId}">

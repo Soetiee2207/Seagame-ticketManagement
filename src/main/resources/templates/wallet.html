@@ -1,0 +1,116 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+
+<head th:replace="~{fragments/layout :: head('Ví của tôi - SEA Games')}"></head>
+
+<body class="d-flex flex-column min-vh-100">
+    <nav th:replace="~{fragments/layout :: navbar}"></nav>
+
+    <main class="flex-fill">
+        <div class="container py-5">
+            <div class="row justify-content-center">
+                <div class="col-lg-8">
+                    <h2 class="mb-4 text-center">
+                        <i class="bi bi-wallet2 me-2"></i>Ví của tôi
+                    </h2>
+
+                    <!-- Alert Messages -->
+                    <div th:if="${success}" class="alert alert-success alert-dismissible fade show">
+                        <i class="bi bi-check-circle me-2"></i><span th:text="${success}"></span>
+                        <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+                    </div>
+                    <div th:if="${error}" class="alert alert-danger alert-dismissible fade show">
+                        <i class="bi bi-exclamation-triangle me-2"></i><span th:text="${error}"></span>
+                        <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+                    </div>
+
+                    <div class="row g-4">
+                        <!-- Balance Card -->
+                        <div class="col-md-6">
+                            <div class="card shadow border-0 h-100">
+                                <div class="card-body text-center py-5">
+                                    <i class="bi bi-wallet-fill display-1 text-primary mb-3"></i>
+                                    <h6 class="text-muted mb-2">Số dư hiện tại</h6>
+                                    <h2 class="display-5 fw-bold text-success mb-0">
+                                        <span
+                                            th:text="${#numbers.formatDecimal(balance, 0, 'COMMA', 0, 'POINT')}">0</span>
+                                        <small class="fs-4">VNĐ</small>
+                                    </h2>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Deposit Form -->
+                        <div class="col-md-6">
+                            <div class="card shadow border-0 h-100">
+                                <div class="card-header bg-success text-white">
+                                    <h5 class="mb-0"><i class="bi bi-plus-circle me-2"></i>Nạp tiền vào ví</h5>
+                                </div>
+                                <div class="card-body">
+                                    <form th:action="@{/wallet/deposit}" method="post">
+                                        <div class="mb-3">
+                                            <label for="amount" class="form-label">Số tiền nạp (VNĐ)</label>
+                                            <input type="number" class="form-control form-control-lg" id="amount"
+                                                name="amount" min="10000" step="10000" placeholder="Nhập số tiền"
+                                                required>
+                                        </div>
+
+                                        <!-- Quick Amount Buttons -->
+                                        <div class="mb-3">
+                                            <label class="form-label">Chọn nhanh:</label>
+                                            <div class="d-flex flex-wrap gap-2">
+                                                <button type="button" class="btn btn-outline-success quick-amount"
+                                                    data-amount="50000">50.000</button>
+                                                <button type="button" class="btn btn-outline-success quick-amount"
+                                                    data-amount="100000">100.000</button>
+                                                <button type="button" class="btn btn-outline-success quick-amount"
+                                                    data-amount="200000">200.000</button>
+                                                <button type="button" class="btn btn-outline-success quick-amount"
+                                                    data-amount="500000">500.000</button>
+                                                <button type="button" class="btn btn-outline-success quick-amount"
+                                                    data-amount="1000000">1.000.000</button>
+                                            </div>
+                                        </div>
+
+                                        <div class="d-grid">
+                                            <button type="submit" class="btn btn-success btn-lg">
+                                                <i class="bi bi-credit-card me-2"></i>Nạp tiền
+                                            </button>
+                                        </div>
+                                    </form>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Info Note -->
+                    <div class="alert alert-info mt-4">
+                        <i class="bi bi-info-circle me-2"></i>
+                        <strong>Lưu ý:</strong> Đây là hệ thống nạp tiền mô phỏng.
+                        Số tiền sẽ được cộng trực tiếp vào tài khoản để thanh toán mua vé.
+                    </div>
+
+                    <!-- Back Button -->
+                    <div class="text-center mt-4">
+                        <a th:href="@{/matches}" class="btn btn-outline-primary">
+                            <i class="bi bi-calendar-event me-2"></i>Đặt vé ngay
+                        </a>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </main>
+
+    <footer th:replace="~{fragments/layout :: footer}"></footer>
+    <th:block th:replace="~{fragments/layout :: scripts}"></th:block>
+
+    <script>
+        document.querySelectorAll('.quick-amount').forEach(btn => {
+            btn.addEventListener('click', function () {
+                document.getElementById('amount').value = this.dataset.amount;
+            });
+        });
+    </script>
+</body>
+
+</html>

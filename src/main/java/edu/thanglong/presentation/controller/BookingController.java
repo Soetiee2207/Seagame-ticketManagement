@@ -1,6 +1,7 @@
 package edu.thanglong.presentation.controller;
 
 import edu.thanglong.application.dto.BookingRequest;
+import edu.thanglong.application.dto.CheckoutDTO;
 import edu.thanglong.application.dto.MatchDTO;
 import edu.thanglong.application.dto.SeatDTO;
 import edu.thanglong.application.dto.TicketDTO;
@@ -44,16 +45,41 @@ public class BookingController {
         return "booking";
     }
 
-    @PostMapping("/booking/book")
-    public String bookTicket(@RequestParam Long seatId, 
-                             @RequestParam Long matchId,
-                             HttpSession session,
-                             RedirectAttributes redirectAttributes) {
+    @PostMapping("/checkout")
+    public String checkoutPage(@RequestParam Long seatId, 
+                               @RequestParam Long matchId,
+                               Model model,
+                               HttpSession session,
+                               RedirectAttributes redirectAttributes) {
+        try {
+            CheckoutDTO checkout = bookingService.getCheckoutInfo(seatId, matchId);
+            model.addAttribute("checkout", checkout);
+            model.addAttribute("currentUser", session.getAttribute("currentUser"));
+            return "checkout";
+        } catch (Exception e) {
+            redirectAttributes.addFlashAttribute("error", e.getMessage());
+            return "redirect:/booking/" + matchId;
+        }
+    }
+
+    @PostMapping("/checkout/confirm")
+    public String confirmPayment(@RequestParam Long seatId,
+                                 @RequestParam Long matchId,
+                                 @RequestParam String paymentMethod,
+                                 HttpSession session,
+                                 Model model,
+                                 RedirectAttributes redirectAttributes) {
         try {
             User currentUser = (User) session.getAttribute("currentUser");
-            TicketDTO ticket = bookingService.bookTicket(currentUser.getId(), seatId, matchId);
-            redirectAttributes.addFlashAttribute("success", "Đặt vé thành công! Mã vé: " + ticket.getTicketCode());
-            return "redirect:/my-tickets";
+            TicketDTO ticket = bookingService.bookTicket(currentUser.getId(), seatId, matchId, paymentMethod);
+            
+            // Update session with new balance
+            currentUser.setBalance(currentUser.getBalance().subtract(ticket.getPrice()));
+            session.setAttribute("currentUser", currentUser);
+            
+            model.addAttribute("ticket", ticket);
+            model.addAttribute("currentUser", currentUser);
+            return "payment-success";
         } catch (Exception e) {
             redirectAttributes.addFlashAttribute("error", e.getMessage());
             return "redirect:/booking/" + matchId;
@@ -70,4 +96,26 @@ public class BookingController {
         
         return "my-tickets";
     }
+
+    @GetMapping("/my-tickets/{ticketId}")
+    public String ticketDetail(@PathVariable Long ticketId, Model model, HttpSession session) {
+        User currentUser = (User) session.getAttribute("currentUser");
+        List<TicketDTO> tickets = bookingService.getUserTickets(currentUser.getId());
+        
+        // Find ticket by ID
+        TicketDTO ticket = tickets.stream()
+                .filter(t -> t.getId().equals(ticketId))
+                .findFirst()
+                .orElse(null);
+        
+        if (ticket == null) {
+            return "redirect:/my-tickets";
+        }
+        
+        model.addAttribute("ticket", ticket);
+        model.addAttribute("currentUser", currentUser);
+        
+        return "ticket-detail";
+    }
 }
+
