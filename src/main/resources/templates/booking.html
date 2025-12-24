@@ -1,0 +1,100 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+
+<head th:replace="~{fragments/layout :: head('Đặt vé - ' + ${match.matchName})}"></head>
+
+<body class="d-flex flex-column min-vh-100">
+    <nav th:replace="~{fragments/layout :: navbar}"></nav>
+
+    <main class="flex-fill">
+        <div class="container py-5">
+            <div class="row">
+                <!-- Match Info -->
+                <div class="col-lg-4 mb-4">
+                    <div class="card shadow-sm border-0 sticky-top" style="top: 20px;">
+                        <div class="card-header bg-primary text-white">
+                            <h5 class="mb-0"><i class="bi bi-info-circle me-2"></i>Thông tin trận đấu</h5>
+                        </div>
+                        <div class="card-body">
+                            <h4 th:text="${match.matchName}">Tên trận đấu</h4>
+                            <p class="mb-2">
+                                <i class="bi bi-calendar3 me-2 text-primary"></i>
+                                <span th:text="${#temporals.format(match.startTime, 'dd/MM/yyyy HH:mm')}">Thời
+                                    gian</span>
+                            </p>
+                            <p class="mb-3">
+                                <i class="bi bi-geo-alt me-2 text-danger"></i>
+                                <span th:text="${match.location}">Địa điểm</span>
+                            </p>
+
+                            <hr>
+
+                            <h6><i class="bi bi-palette me-2"></i>Chú thích màu ghế:</h6>
+                            <div class="d-flex flex-wrap gap-2 mt-2">
+                                <span class="badge seat-vip px-3 py-2">VIP</span>
+                                <span class="badge seat-standard px-3 py-2">Standard</span>
+                                <span class="badge seat-booked px-3 py-2">Đã đặt</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Stadium Map -->
+                <div class="col-lg-8">
+                    <div class="card shadow-sm border-0">
+                        <div class="card-header bg-warning text-dark">
+                            <h5 class="mb-0"><i class="bi bi-grid-3x3 me-2"></i>Sơ đồ sân vận động</h5>
+                        </div>
+                        <div class="card-body">
+                            <div th:if="${error}" class="alert alert-danger alert-dismissible fade show">
+                                <i class="bi bi-exclamation-triangle me-2"></i><span th:text="${error}"></span>
+                                <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+                            </div>
+                            <div th:if="${success}" class="alert alert-success alert-dismissible fade show">
+                                <i class="bi bi-check-circle me-2"></i><span th:text="${success}"></span>
+                                <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+                            </div>
+
+                            <!-- Stage -->
+                            <div class="stage-area text-center py-3 mb-4 bg-dark text-white rounded">
+                                <i class="bi bi-music-note-beamed me-2"></i>SÂN KHẤU / SÂN
+                            </div>
+
+                            <!-- Seats Grid -->
+                            <div class="seats-container">
+                                <div class="row g-2 justify-content-center">
+                                    <div th:each="seat : ${seats}" class="col-auto">
+                                        <form th:if="${!seat.booked}" th:action="@{/booking/book}" method="post"
+                                            class="d-inline">
+                                            <input type="hidden" name="seatId" th:value="${seat.id}">
+                                            <input type="hidden" name="matchId" th:value="${matchId}">
+                                            <button type="submit" class="seat-btn"
+                                                th:classappend="${seat.categoryName == 'VIP' || seat.categoryName == 'Super VIP'} ? 'seat-vip' : 'seat-standard'"
+                                                th:title="${seat.seatCode + ' - ' + seat.categoryName + ' - ' + #numbers.formatDecimal(seat.price, 0, 0) + ' VNĐ'}">
+                                                <span th:text="${seat.seatCode}">A01</span>
+                                            </button>
+                                        </form>
+                                        <button th:if="${seat.booked}" class="seat-btn seat-booked" disabled
+                                            th:title="${seat.seatCode + ' - Đã được đặt'}">
+                                            <span th:text="${seat.seatCode}">A01</span>
+                                        </button>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div th:if="${#lists.isEmpty(seats)}" class="text-center py-5">
+                                <i class="bi bi-inbox display-1 text-muted"></i>
+                                <p class="text-muted mt-3">Chưa có ghế nào được thiết lập cho trận đấu này</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </main>
+
+    <footer th:replace="~{fragments/layout :: footer}"></footer>
+    <th:block th:replace="~{fragments/layout :: scripts}"></th:block>
+</body>
+
+</html>

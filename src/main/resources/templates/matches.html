@@ -1,0 +1,54 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+
+<head th:replace="~{fragments/layout :: head('Danh sách trận đấu - SEA Games')}"></head>
+
+<body class="d-flex flex-column min-vh-100">
+    <nav th:replace="~{fragments/layout :: navbar}"></nav>
+
+    <main class="flex-fill">
+        <div class="container py-5">
+            <h2 class="mb-4">
+                <i class="bi bi-calendar-event me-2"></i>Danh sách trận đấu
+            </h2>
+
+            <div th:if="${#lists.isEmpty(matches)}" class="text-center py-5">
+                <i class="bi bi-calendar-x display-1 text-muted"></i>
+                <p class="text-muted mt-3">Chưa có trận đấu nào được lên lịch</p>
+            </div>
+
+            <div class="row g-4">
+                <div th:each="match : ${matches}" class="col-md-6 col-lg-4">
+                    <div class="card h-100 shadow-sm border-0 match-card">
+                        <div class="card-header bg-warning text-dark">
+                            <h5 class="card-title mb-0">
+                                <i class="bi bi-trophy me-2"></i><span th:text="${match.matchName}">Trận đấu</span>
+                            </h5>
+                        </div>
+                        <div class="card-body">
+                            <p class="mb-2">
+                                <i class="bi bi-calendar3 me-2 text-primary"></i>
+                                <span th:text="${#temporals.format(match.startTime, 'dd/MM/yyyy HH:mm')}">Thời
+                                    gian</span>
+                            </p>
+                            <p class="mb-0">
+                                <i class="bi bi-geo-alt me-2 text-danger"></i>
+                                <span th:text="${match.location}">Địa điểm</span>
+                            </p>
+                        </div>
+                        <div class="card-footer bg-white border-0 pb-3">
+                            <a th:href="@{/booking/{id}(id=${match.id})}" class="btn btn-primary w-100">
+                                <i class="bi bi-ticket me-2"></i>Đặt vé
+                            </a>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </main>
+
+    <footer th:replace="~{fragments/layout :: footer}"></footer>
+    <th:block th:replace="~{fragments/layout :: scripts}"></th:block>
+</body>
+
+</html>

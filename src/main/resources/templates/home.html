@@ -1,0 +1,100 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+
+<head th:replace="~{fragments/layout :: head('SEA Games 2025 - Hệ thống đặt vé')}"></head>
+
+<body class="d-flex flex-column min-vh-100">
+    <nav th:replace="~{fragments/layout :: navbar}"></nav>
+
+    <main class="flex-fill">
+        <!-- Hero Section -->
+        <section class="hero-section bg-primary text-white py-5">
+            <div class="container text-center py-5">
+                <h1 class="display-4 fw-bold mb-3">
+                    <i class="bi bi-trophy-fill me-3"></i>SEA Games 2025
+                </h1>
+                <p class="lead mb-4">Hệ thống đặt vé trực tuyến - Đại hội Thể thao Đông Nam Á</p>
+                <a th:href="@{/matches}" class="btn btn-light btn-lg px-5">
+                    <i class="bi bi-ticket-perforated me-2"></i>Đặt vé ngay
+                </a>
+            </div>
+        </section>
+
+        <!-- Matches Section -->
+        <section class="py-5">
+            <div class="container">
+                <h2 class="text-center mb-5">
+                    <i class="bi bi-calendar-event me-2"></i>Các trận đấu sắp diễn ra
+                </h2>
+
+                <div th:if="${#lists.isEmpty(matches)}" class="text-center py-5">
+                    <i class="bi bi-calendar-x display-1 text-muted"></i>
+                    <p class="text-muted mt-3">Chưa có trận đấu nào được lên lịch</p>
+                </div>
+
+                <div class="row g-4">
+                    <div th:each="match : ${matches}" class="col-md-6 col-lg-4">
+                        <div class="card h-100 shadow-sm border-0 match-card">
+                            <div class="card-header bg-warning text-dark">
+                                <h5 class="card-title mb-0">
+                                    <i class="bi bi-trophy me-2"></i><span th:text="${match.matchName}">Trận đấu</span>
+                                </h5>
+                            </div>
+                            <div class="card-body">
+                                <p class="mb-2">
+                                    <i class="bi bi-calendar3 me-2 text-primary"></i>
+                                    <span th:text="${#temporals.format(match.startTime, 'dd/MM/yyyy HH:mm')}">Thời
+                                        gian</span>
+                                </p>
+                                <p class="mb-0">
+                                    <i class="bi bi-geo-alt me-2 text-danger"></i>
+                                    <span th:text="${match.location}">Địa điểm</span>
+                                </p>
+                            </div>
+                            <div class="card-footer bg-white border-0 pb-3">
+                                <a th:href="@{/booking/{id}(id=${match.id})}" class="btn btn-primary w-100">
+                                    <i class="bi bi-ticket me-2"></i>Đặt vé
+                                </a>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Features Section -->
+        <section class="bg-light py-5">
+            <div class="container">
+                <h2 class="text-center mb-5">Tính năng nổi bật</h2>
+                <div class="row g-4">
+                    <div class="col-md-4 text-center">
+                        <div class="feature-icon mb-3">
+                            <i class="bi bi-lightning-charge display-4 text-warning"></i>
+                        </div>
+                        <h5>Đặt vé nhanh chóng</h5>
+                        <p class="text-muted">Chỉ với vài bước đơn giản, bạn đã có vé trong tay</p>
+                    </div>
+                    <div class="col-md-4 text-center">
+                        <div class="feature-icon mb-3">
+                            <i class="bi bi-shield-check display-4 text-success"></i>
+                        </div>
+                        <h5>An toàn & Bảo mật</h5>
+                        <p class="text-muted">Mã vé được mã hóa, check-in tự động</p>
+                    </div>
+                    <div class="col-md-4 text-center">
+                        <div class="feature-icon mb-3">
+                            <i class="bi bi-phone display-4 text-primary"></i>
+                        </div>
+                        <h5>Tiện lợi mọi nơi</h5>
+                        <p class="text-muted">Truy cập và quản lý vé trên mọi thiết bị</p>
+                    </div>
+                </div>
+            </div>
+        </section>
+    </main>
+
+    <footer th:replace="~{fragments/layout :: footer}"></footer>
+    <th:block th:replace="~{fragments/layout :: scripts}"></th:block>
+</body>
+
+</html>

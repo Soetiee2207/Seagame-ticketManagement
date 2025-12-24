@@ -1,0 +1,27 @@
+# Render.com deployment configuration
+services:
+  - type: web
+    name: seagame-ticketing
+    runtime: docker
+    dockerfilePath: ./Dockerfile
+    envVars:
+      - key: SPRING_PROFILES_ACTIVE
+        value: prod
+      - key: DATABASE_URL
+        fromDatabase:
+          name: seagame-db
+          property: connectionString
+      - key: DATABASE_USERNAME
+        fromDatabase:
+          name: seagame-db
+          property: user
+      - key: DATABASE_PASSWORD
+        fromDatabase:
+          name: seagame-db
+          property: password
+
+databases:
+  - name: seagame-db
+    databaseName: seagame_db
+    user: seagame_user
+    plan: free
