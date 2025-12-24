@@ -30,8 +30,8 @@ public class DataInitializer implements CommandLineRunner {
     @Override
     @Transactional
     public void run(String... args) throws Exception {
-        // Chỉ khởi tạo nếu database trống
-        if (userRepository.count() == 0) {
+        // Chỉ khởi tạo nếu chưa có admin
+        if (!userRepository.existsByUsername("admin")) {
             System.out.println("=== Khởi tạo dữ liệu mẫu cho SEA Games Ticketing ===");
             
             initUsers();
